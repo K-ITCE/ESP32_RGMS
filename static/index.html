@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireless Sensor Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4895ef;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-main: #2b2d42;
+      --text-muted: #8d99ae;
+      --success-color: #2a9d8f;
+      --danger-color: #e63946;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --radius: 12px;
+      --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+    }
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+    .status-text.ok { color: var(--success-color); }
+    .status-text.err { color: var(--danger-color); }
+    .status-dot.ok { background: var(--success-color); box-shadow: 0 0 8px var(--success-color); }
+    .status-dot.err { background: var(--danger-color); box-shadow: 0 0 8px var(--danger-color); }
+    .status-dot.warn { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+    .status-text.warn { color: #f59e0b; }
+    
+    .status-group {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Cards Grid */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s;
+      border-left: 4px solid var(--accent-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .card-icon {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2rem;
+      opacity: 0.1;
+      color: var(--text-main);
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .unit { font-size: 1.2rem; font-weight: 400; color: var(--text-muted); }
+
+    .timestamp {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Charts Section */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .chart-container {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: relative;
+      height: 300px;
+    }
+
+    .chart-container canvas {
+      max-height: 250px !important;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .chart-header h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--text-main);
+    }
+
+    .btn-action {
+      background: transparent;
+      border: 1px solid var(--text-muted);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-action:hover {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    /* Table Section */
+    .table-container {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 2px solid rgba(0,0,0,0.05);
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    
+    tbody tr:hover {
+      background-color: rgba(0,0,0,0.02);
+    }
+
+    /* Utilities */
+    .temp-text { color: #e76f51; }
+    .hum-text { color: #2a9d8f; }
+
+    @media (max-width: 768px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      header { padding: 15px 20px; }
+      h1 { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1><i class="fa-solid fa-wifi"></i> ESP32 Sensor Node</h1>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+      <i class="fa-solid fa-moon" id="themeIcon"></i>
+    </button>
+  </header>
+
+  <div class="container">
+    
+    <div class="status-bar">
+      <div class="status-group">
+        <div class="status-item">
+          <div class="status-dot" id="statusDot"></div>
+          <span class="status-text" id="statusText">Initializing...</span>
+        </div>
+        <div class="status-item">
+          <div class="status-dot" id="espStatusDot"></div>
+          <span class="status-text" id="espStatusText">ESP32: Waiting...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cards">
+      <!-- Temperature Card -->
+      <div class="card" style="border-left-color: #e76f51;">
+        <i class="fa-solid fa-temperature-half card-icon"></i>
+        <div class="card-title">Temperature</div>
+        <div class="card-value temp-text" id="latestTemp">-- <span class="unit">°C</span></div>
+        <div class="timestamp">
+          <i class="fa-regular fa-clock"></i> <span id="latestTempTime">--</span>
+        </div>
+      </div>
+
+      <!-- Humidity Card -->
+      <div class="card" style="border-left-color: #2a9d8f;">
+        <i class="fa-solid fa-droplet card-icon"></i>
+        <div class="card-title">Humidity</div>
+        <div class="card-value hum-text" id="latestHum">-- <span class="unit">%</span></div>
+        <div class="timestamp">
+          <i class="fa-regular fa-clock"></i> <span id="latestHumTime">--</span>
+        </div>
+      </div>
+
+      <!-- Average Card -->
+      <div class="card" style="border-left-color: #e9c46a;">
+        <i class="fa-solid fa-chart-simple card-icon"></i>
+        <div class="card-title">Window Average</div>
+        <div style="display: flex; gap: 15px; align-items: baseline;">
+          <div style="font-size: 1.5rem; font-weight: bold;" class="temp-text" id="avgTemp">--</div>
+          <div style="font-size: 1.5rem; font-weight: bold;" class="hum-text" id="avgHum">--</div>
+        </div>
+        <div class="timestamp" id="windowInfo">Waiting for data...</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>Temperature History</h3>
+          <button class="btn-action" onclick="downloadChart('tempChart', 'Temperature_Chart')">
+            <i class="fa-solid fa-download"></i> Image
+          </button>
+        </div>
+        <canvas id="tempChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>Humidity History</h3>
+          <button class="btn-action" onclick="downloadChart('humChart', 'Humidity_Chart')">
+            <i class="fa-solid fa-download"></i> Image
+          </button>
+        </div>
+        <canvas id="humChart"></canvas>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <div class="table-header">
+        <h3><i class="fa-solid fa-list"></i> Detailed Readings</h3>
+        <button class="btn-action" onclick="exportCSV()">
+          <i class="fa-solid fa-file-csv"></i> Export CSV
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Time</th>
+            <th>Temperature (°C)</th>
+            <th>Humidity (%)</th>
+          </tr>
+        </thead>
+        <tbody id="readingsTableBody">
+          <!-- filled by JS -->
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script>
+    // --- UI Elements ---
+    const statusText = document.getElementById('statusText');
+    const statusDot = document.getElementById('statusDot');
+    const espStatusText = document.getElementById('espStatusText');
+    const espStatusDot = document.getElementById('espStatusDot');
+    const latestTempEl = document.getElementById('latestTemp');
+    const latestHumEl = document.getElementById('latestHum');
+    const latestTempTimeEl = document.getElementById('latestTempTime');
+    const latestHumTimeEl = document.getElementById('latestHumTime');
+    const avgTempEl = document.getElementById('avgTemp');
+    const avgHumEl = document.getElementById('avgHum');
+    const windowInfoEl = document.getElementById('windowInfo');
+    const tableBodyEl = document.getElementById('readingsTableBody');
+    const themeIcon = document.getElementById('themeIcon');
+
+    let tempChart = null;
+    let humChart = null;
+    let currentReadings = [];
+
+    // --- Theme Management ---
+    function toggleTheme() {
+      const body = document.body;
+      const isDark = body.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        body.removeAttribute('data-theme');
+        themeIcon.className = 'fa-solid fa-moon';
+        localStorage.setItem('theme', 'light');
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        themeIcon.className = 'fa-solid fa-sun';
+        localStorage.setItem('theme', 'dark');
+      }
+      updateChartTheme();
+    }
+
+    // Load saved theme
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.setAttribute('data-theme', 'dark');
+      themeIcon.className = 'fa-solid fa-sun';
+    }
+
+    function updateChartTheme() {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      const color = isDark ? '#94a3b8' : '#666';
+      const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+      
+      [tempChart, humChart].forEach(chart => {
+        if (chart) {
+          chart.options.scales.x.ticks.color = color;
+          chart.options.scales.y.ticks.color = color;
+          chart.options.scales.x.grid.color = gridColor;
+          chart.options.scales.y.grid.color = gridColor;
+          chart.update('none');
+        }
+      });
+    }
+
+    // --- Helpers ---
+    function formatTime(ts) {
+      if (!ts) return '';
+      return new Date(ts * 1000).toLocaleTimeString();
+    }
+
+    // --- Data Fetching ---
+    async function fetchSummary() {
+      try {
+        const res = await fetch('/api/summary');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        
+        statusText.textContent = 'System Online';
+        statusText.className = 'status-text ok';
+        statusDot.className = 'status-dot ok';
+        
+        updateUI(data);
+      } catch (err) {
+        statusText.textContent = 'Connection Lost';
+        statusText.className = 'status-text err';
+        statusDot.className = 'status-dot err';
+        console.error(err);
+      }
+    }
+
+    function updateUI(data) {
+      const readings = data.readings || [];
+      currentReadings = readings; // Store for CSV export
+      const latest = data.latest || null;
+      const avg = data.average || null;
+
+      // ESP32 Connection Status
+      if (data.esp_connected) {
+        espStatusText.textContent = 'ESP32: Connected';
+        espStatusText.className = 'status-text ok';
+        espStatusDot.className = 'status-dot ok';
+      } else if (data.last_esp_contact > 0) {
+        const lastSeen = new Date(data.last_esp_contact * 1000).toLocaleTimeString();
+        espStatusText.textContent = `ESP32: Disconnected (last: ${lastSeen})`;
+        espStatusText.className = 'status-text err';
+        espStatusDot.className = 'status-dot err';
+      } else {
+        espStatusText.textContent = 'ESP32: Never Connected';
+        espStatusText.className = 'status-text warn';
+        espStatusDot.className = 'status-dot warn';
+      }
+
+      // Latest values
+      if (latest) {
+        latestTempEl.innerHTML = `${latest.temperature.toFixed(1)} <span class="unit">°C</span>`;
+        latestHumEl.innerHTML = `${latest.humidity.toFixed(1)} <span class="unit">%</span>`;
+        const tStr = formatTime(latest.timestamp);
+        latestTempTimeEl.textContent = tStr;
+        latestHumTimeEl.textContent = tStr;
+      }
+
+      // Averages
+      if (avg && !isNaN(avg.temperature)) {
+        avgTempEl.textContent = avg.temperature.toFixed(1) + '°C';
+        avgHumEl.textContent = avg.humidity.toFixed(1) + '%';
+      }
+      
+      windowInfoEl.textContent = `Based on last ${readings.length} readings`;
+
+      // Charts
+      const labels = readings.map(r => formatTime(r.timestamp));
+      const tempData = readings.map(r => r.temperature);
+      const humData = readings.map(r => r.humidity);
+
+      updateCharts(labels, tempData, humData);
+      updateTable(readings);
+    }
+
+    function createChart(ctx, label, color, data, labels) {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      const textColor = isDark ? '#94a3b8' : '#666';
+      const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+
+      return new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: label,
+            data: data,
+            borderColor: color,
+            backgroundColor: color + '20', // 20% opacity
+            borderWidth: 2,
+            pointRadius: 3,
+            pointHoverRadius: 6,
+            fill: true,
+            tension: 0.2
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            },
+            y: {
+              beginAtZero: false,
+              min: 0,
+              max: 100,
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            }
+          }
+        }
+      });
+    }
+
+    function updateCharts(labels, tempData, humData) {
+      const tempCtx = document.getElementById('tempChart').getContext('2d');
+      const humCtx = document.getElementById('humChart').getContext('2d');
+
+      if (!tempChart) {
+        tempChart = createChart(tempCtx, 'Temperature (°C)', '#e76f51', tempData, labels);
+      } else {
+        // Clear and replace data completely to prevent accumulation
+        tempChart.data.labels.length = 0;
+        tempChart.data.datasets[0].data.length = 0;
+        labels.forEach(l => tempChart.data.labels.push(l));
+        tempData.forEach(d => tempChart.data.datasets[0].data.push(d));
+        tempChart.update('none');
+      }
+
+      if (!humChart) {
+        humChart = createChart(humCtx, 'Humidity (%)', '#2a9d8f', humData, labels);
+      } else {
+        // Clear and replace data completely to prevent accumulation
+        humChart.data.labels.length = 0;
+        humChart.data.datasets[0].data.length = 0;
+        labels.forEach(l => humChart.data.labels.push(l));
+        humData.forEach(d => humChart.data.datasets[0].data.push(d));
+        humChart.update('none');
+      }
+    }
+
+    function updateTable(readings) {
+      // Only update if necessary to prevent scroll jumping, or simply rebuild
+      tableBodyEl.innerHTML = '';
+      // Reverse to show newest first in table
+      const reversed = [...readings].reverse();
+      
+      reversed.forEach((r, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${readings.length - i}</td>
+          <td>${formatTime(r.timestamp)}</td>
+          <td style="font-weight:bold; color:#e76f51">${r.temperature.toFixed(1)}</td>
+          <td style="font-weight:bold; color:#2a9d8f">${r.humidity.toFixed(1)}</td>
+        `;
+        tableBodyEl.appendChild(tr);
+      });
+    }
+
+    // --- Fancy Features ---
+    
+    function downloadChart(canvasId, fileName) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = fileName + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function exportCSV() {
+      if (currentReadings.length === 0) {
+        alert('No data to export');
+        return;
+      }
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Timestamp,Time,Temperature,Humidity\n";
+      
+      currentReadings.forEach(r => {
+        const timeStr = new Date(r.timestamp * 1000).toISOString();
+        const row = `${r.timestamp},${timeStr},${r.temperature},${r.humidity}`;
+        csvContent += row + "\n";
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "sensor_data.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Init
+    fetchSummary();
+    setInterval(fetchSummary, 2500);
+  </script>
+</body>
+</html>
