@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Approval</title>
+  <link rel="stylesheet" href="/style/admin.css">
+</head>
+<body>
+  <header>
+    <h1>Admin Panel</h1>
+    <a href="/logout" class="logout-btn">Logout</a>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="card-header">
+        <h2>Registered Users</h2>
+        <button onclick="loadUsers()">Refresh</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          <tr>
+            <td colspan="4">Loading users...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    async function loadUsers() {
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = '<tr><td colspan="4">Loading users...</td></tr>';
+
+      try {
+        const response = await fetch('/api/admin/users');
+        if (!response.ok) throw new Error('Failed to load users');
+        const users = await response.json();
+
+        if (users.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4">No registered users yet.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = '';
+        users.forEach(user => {
+          const row = document.createElement('tr');
+          const approveButton = user.status === 'pending'
+            ? '<button class="approve" onclick="approveUser(' + user.id + ')">Approve</button>'
+            : '';
+
+          row.innerHTML =
+            '<td>' + user.email + '</td>' +
+            '<td><span class="status ' + user.status + '">' + user.status + '</span></td>' +
+            '<td>' + user.created_at + '</td>' +
+            '<td>' + approveButton + '<button class="disapprove" onclick="disapproveUser(' + user.id + ')">Disapprove</button></td>';
+
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="4">Error loading users.</td></tr>';
+      }
+    }
+
+    async function approveUser(id) {
+      const response = await fetch('/api/admin/users/approve?id=' + id, { method: 'POST' });
+      if (!response.ok) {
+        alert('Could not approve user.');
+        return;
+      }
+      loadUsers();
+    }
+
+    async function disapproveUser(id) {
+      if (!confirm('Disapprove and delete this user?')) return;
+
+      const response = await fetch('/api/admin/users/disapprove?id=' + id, { method: 'POST' });
+      if (!response.ok) {
+        alert('Could not disapprove user.');
+        return;
+      }
+      loadUsers();
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>

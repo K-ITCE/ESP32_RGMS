@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/style/login.css">
+</head>
+<body>
+
+   <div class="register-container">
+    <form action="/submit-login" method="POST">
+      <h2>Login</h2>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required><br/>
+
+      <label for="pwd">Password:</label>
+      <input type="password" id="pwd" name="pwd" required><br/>
+
+      <button type="submit">Login</button>
+
+      <p class="switch">
+        Don't have an account?
+        <a href="/register">Register</a>
+      </p>
+    </form>
+   </div>
+
+   <script>
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+    const registered = params.get('registered');
+
+    if (registered === 'pending') {
+      alert('Registration sent. Please wait for admin approval.');
+    }
+
+    if (error === 'pending') {
+      alert('Your account is still waiting for admin approval.');
+    } else if (error === 'wrong') {
+      alert('Wrong email or password.');
+    } else if (error) {
+      alert('Login failed. Please try again.');
+    }
+   </script>
+</body>
+</html>

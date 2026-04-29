@@ -13,6 +13,8 @@
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <HTTPClient.h>
+#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #include <DHT.h>
 #include <ESP.h>
 
@@ -132,16 +134,30 @@ void httpTask(void *parameter) {
             payloadJson += R"JSON(,"humidity":)JSON";
             payloadJson += String(sensorData.humidity, 1);
             payloadJson += R"JSON(})JSON";
-            
             // Create HTTP client
             HTTPClient http;
-            String serverURL = "http://" SERVER_IP ":8000/api/readings";
-            
-            http.begin(serverURL);
-            http.addHeader("Content-Type", "application/json");
-            
-            // Send POST request
-            int httpCode = http.POST(payloadJson);
+            String serverURL = SERVER_URL;
+            int httpCode = -1;
+
+            Serial.print("[HTTP] Sending to: " );
+            Serial.println(serverURL);
+
+            if (serverURL.startsWith("https://")) {
+                WiFiClientSecure client;
+
+                // For a student/demo project, this avoids certificate setup problems.
+                // For production, use the server root certificate instead of setInsecure().
+                client.setInsecure();
+
+                http.begin(client, serverURL);
+                http.addHeader("Content-Type", "application/json");
+                httpCode = http.POST(payloadJson);
+            } else {
+                WiFiClient client;
+                http.begin(client, serverURL);
+                http.addHeader("Content-Type", "application/json");
+                httpCode = http.POST(payloadJson);
+            }
             
             LedEvent_t ledEvent;
             if (httpCode > 0) {

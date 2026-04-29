@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: esp32-rgms
+    env: go
+    buildCommand: cd backend && go build -o app .
+    startCommand: cd backend && ./app
+    envVars:
+      - key: FRONTEND_DIR
+        value: ../frontend
+      - key: ADMIN_EMAIL
+        value: admin@gmail.com
+      - key: ADMIN_PASSWORD
+        value: admin-1610
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DB_PATH
+        value: app.db

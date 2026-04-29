@@ -1,0 +1,120 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background: #f4f7f6;
+  color: #24342f;
+}
+
+header {
+  background: linear-gradient(135deg, #0f3d2e, #1f7a63);
+  color: white;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header h1 {
+  font-size: 24px;
+}
+
+.logout-btn,
+.card-header button,
+.approve,
+.disapprove {
+  padding: 9px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.logout-btn {
+  background: white;
+  color: #1f7a63;
+  font-weight: bold;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 35px auto;
+  padding: 0 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  padding: 25px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.card-header h2 {
+  color: #1f7a63;
+}
+
+.card-header button,
+.approve {
+  background: #1f7a63;
+  color: white;
+}
+
+.card-header button:hover,
+.approve:hover {
+  background: #16614f;
+}
+
+.disapprove {
+  background: #c0392b;
+  color: white;
+  margin-left: 8px;
+}
+
+.disapprove:hover {
+  background: #922b21;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  color: #1f7a63;
+}
+
+.status {
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status.approved {
+  background: #d4edda;
+  color: #155724;
+}
