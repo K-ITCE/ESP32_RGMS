@@ -1,3 +1,7 @@
+Physical System:
+    
+
+
 Languages Used:
 - Go (Golang) – backend development and API handling
 - HTML – structure of web pages (login, register, dashboard, admin)

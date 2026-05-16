@@ -1,5 +1,5 @@
 /**
- * ESP32 DHT11 -> Go Backend (JSON HTTP POST) - FreeRTOS Version
+ * ESP32 DHT11 -> Go Backend (JSON HTTP POST)
  * 
  * FreeRTOS Tasks:
  * 1. wifiTask        - Manages WiFi connection
