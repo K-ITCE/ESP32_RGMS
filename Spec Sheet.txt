@@ -1,0 +1,23 @@
+Languages Used:
+- Go (Golang) – backend development and API handling
+- HTML – structure of web pages (login, register, dashboard, admin)
+- CSS – styling and UI design
+- C – ESP32 microcontroller programming
+
+Technologies Used:
+- Go net/http – web server and routing
+- SQLite / SQL – database for storing users
+- bcrypt – password hashing and security
+- Render – cloud deployment platform
+- ESP32 Wi-Fi module – sending sensor data to backend
+
+Project Features:
+- User registration and login system
+- Password hashing for security
+- Admin approval system (users must be approved before login)
+- Admin dashboard to approve or remove users
+- Role-based access control (admin vs normal user)
+- Session-based authentication
+- Real-time sensor data collection from ESP32
+- API endpoints for readings and summaries
+- Web dashboard for displaying data
