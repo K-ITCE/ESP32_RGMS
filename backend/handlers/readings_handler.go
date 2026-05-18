@@ -9,7 +9,7 @@ import (
 
 // POST /api/readings
 // Body (JSON) from ESP32, e.g.:
-// { "temperature": 24.7, "humidity": 46.3 }
+// { "temperature": 24.7, "temperature2": 25.1, "humidity": 46.3, "light_intensity": 60.0, "fan_speed": 75.0 }
 func (a *App) ReadingsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "only POST allowed", http.StatusMethodNotAllowed)
@@ -43,8 +43,10 @@ func (a *App) ReadingsHandler(w http.ResponseWriter, r *http.Request) {
 	total := len(a.LastReadings)
 	a.Mu.Unlock()
 
-	fmt.Printf("[/api/readings] New reading: T=%.2f °C, H=%.2f %% (total stored: %d)\n",
-		data.Temperature, data.Humidity, total)
+	// fmt.Printf("[/api/readings] New reading: T=%.2f °C, H=%.2f %% (total stored: %d)\n",
+		// data.Temperature, data.Humidity, total)
+	fmt.Printf("[/api/readings] New reading: T1=%.2f °C, T2=%.2f °C, H=%.2f %%, Light=%.2f %%, Fan=%.2f %% (total stored: %d)\n",
+		data.Temperature, data.Temperature2, data.Humidity, data.LightIntensity, data.FanSpeed, total)
 
 	w.WriteHeader(http.StatusOK)
 }

@@ -26,6 +26,10 @@ func main() {
 		log.Fatal("admin seed error:", err)
 	}
 
+	if err := database.SeedThresholds(db); err != nil {
+		log.Fatal("thresholds seed error:", err)
+	}
+
 	app := handlers.NewApp(db)
 
 	http.HandleFunc("/", app.HomeHandler)
@@ -48,6 +52,8 @@ func main() {
 
 	http.HandleFunc("/api/readings", app.ReadingsHandler)
 	http.HandleFunc("/api/summary", app.SummaryHandler)
+	http.HandleFunc("/api/thresholds", app.GetThresholdsHandler)
+	http.HandleFunc("/api/thresholds/update", app.UpdateThresholdsHandler)
 
 	http.HandleFunc("/api/admin/users", app.AdminUsersHandler)
 	http.HandleFunc("/api/admin/users/approve", app.ApproveUserHandler)
@@ -65,7 +71,8 @@ func main() {
 	fmt.Println("Admin page:       http://localhost:" + port + "/admin")
 	fmt.Println("POST readings at  /api/readings")
 	fmt.Println("GET  summary at   /api/summary")
-
+	fmt.Println("GET  thresholds at /api/thresholds")
+	fmt.Println("POST update thresholds at /api/thresholds/update")
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal(err)
 	}

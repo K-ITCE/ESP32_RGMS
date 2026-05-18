@@ -16,6 +16,9 @@
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
       <i class="fa-solid fa-moon" id="themeIcon"></i>
     </button>
+    <button class="settings-btn" onclick="openSettings()" title="Control Settings">
+      <i class="fa-solid fa-sliders"></i>
+    </button>
   </header>
 
   <div class="container">
@@ -36,7 +39,7 @@
     <div class="cards">
       <div class="card" style="border-left-color: #e76f51;">
         <i class="fa-solid fa-temperature-half card-icon"></i>
-        <div class="card-title">Temperature</div>
+        <div class="card-title">Temperature 1 (DHT11)</div>
         <div class="card-value temp-text" id="latestTemp">-- <span class="unit">°C</span></div>
         <div class="timestamp">
           <i class="fa-regular fa-clock"></i> <span id="latestTempTime">--</span>
@@ -51,6 +54,33 @@
           <i class="fa-regular fa-clock"></i> <span id="latestHumTime">--</span>
         </div>
       </div>
+
+      <div class="card" style="border-left-color: #f77f00;">
+      <i class="fa-solid fa-thermometer card-icon"></i>
+      <div class="card-title">Temperature 2 (DS18B20)</div>
+      <div class="card-value temp-text" id="latestTemp2">-- <span class="unit">°C</span></div>
+      <div class="timestamp">
+        <i class="fa-regular fa-clock"></i> <span id="latestTemp2Time">--</span>
+      </div>
+    </div>
+
+    <div class="card" style="border-left-color: #fcbf49;">
+      <i class="fa-solid fa-sun card-icon"></i>
+      <div class="card-title">Light Intensity</div>
+      <div class="card-value" id="latestLight">-- <span class="unit">%</span></div>
+      <div class="timestamp">
+        <i class="fa-regular fa-clock"></i> <span id="latestLightTime">--</span>
+      </div>
+    </div>
+
+    <div class="card" style="border-left-color: #06a77d;">
+      <i class="fa-solid fa-fan card-icon"></i>
+      <div class="card-title">Fan Speed</div>
+      <div class="card-value" id="latestFan">-- <span class="unit">%</span></div>
+      <div class="timestamp">
+        <i class="fa-regular fa-clock"></i> <span id="latestFanTime">--</span>
+      </div>
+    </div>
 
       <div class="card" style="border-left-color: #e9c46a;">
         <i class="fa-solid fa-chart-simple card-icon"></i>
@@ -96,8 +126,11 @@
           <tr>
             <th>#</th>
             <th>Time</th>
-            <th>Temperature (°C)</th>
+            <th>Temperature 1 (°C)</th>
+            <th>Temperature 2 (°C)</th>
             <th>Humidity (%)</th>
+            <th>Light (%)</th>
+            <th>Fan (%)</th>
           </tr>
         </thead>
         <tbody id="readingsTableBody">
@@ -105,6 +138,51 @@
       </table>
     </div>
 
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Threshold Settings</h2>
+          <button class="close-btn" onclick="closeSettings()">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="tempTh1">Temperature Warning (°C):</label>
+            <input type="number" id="tempTh1" step="0.1" min="0" max="50">
+          </div>
+          
+          <div class="form-group">
+            <label for="tempTh2">Temperature Critical (°C):</label>
+            <input type="number" id="tempTh2" step="0.1" min="0" max="50">
+          </div>
+          
+          <div class="form-group">
+            <label for="humTh">Humidity Warning (%):</label>
+            <input type="number" id="humTh" step="0.1" min="0" max="100">
+          </div>
+          
+          <div class="form-group">
+            <label for="lightTh">Light Intensity Threshold (%):</label>
+            <input type="number" id="lightTh" step="0.1" min="0" max="100">
+          </div>
+          
+          <div class="modal-info">
+            <p><strong>How it works:</strong></p>
+            <ul>
+              <li>Fan turns ON at warning threshold</li>
+              <li>Fan runs at 50% until critical threshold</li>
+              <li>Fan runs at 100% at critical threshold</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button onclick="closeSettings()" class="btn-cancel">Cancel</button>
+          <button onclick="saveThresholds()" class="btn-save">Save Changes</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -121,6 +199,12 @@
     const windowInfoEl = document.getElementById('windowInfo');
     const tableBodyEl = document.getElementById('readingsTableBody');
     const themeIcon = document.getElementById('themeIcon');
+    const latestTemp2El = document.getElementById('latestTemp2');
+    const latestLightEl = document.getElementById('latestLight');
+    const latestFanEl = document.getElementById('latestFan');
+    const latestTemp2TimeEl = document.getElementById('latestTemp2Time');
+    const latestLightTimeEl = document.getElementById('latestLightTime');
+    const latestFanTimeEl = document.getElementById('latestFanTime');
 
     let tempChart = null;
     let humChart = null;
@@ -210,9 +294,15 @@
       if (latest) {
         latestTempEl.innerHTML = `${latest.temperature.toFixed(1)} <span class="unit">°C</span>`;
         latestHumEl.innerHTML = `${latest.humidity.toFixed(1)} <span class="unit">%</span>`;
+        latestTemp2El.innerHTML = `${latest.temperature2.toFixed(1)} <span class="unit">°C</span>`;
+        latestLightEl.innerHTML = `${latest.light_intensity.toFixed(1)} <span class="unit">%</span>`;
+        latestFanEl.innerHTML = `${latest.fan_speed.toFixed(1)} <span class="unit">%</span>`;
         const tStr = formatTime(latest.timestamp);
         latestTempTimeEl.textContent = tStr;
         latestHumTimeEl.textContent = tStr;
+        latestTemp2TimeEl.textContent = tStr;
+        latestLightTimeEl.textContent = tStr;
+        latestFanTimeEl.textContent = tStr;
       }
 
       if (avg && !isNaN(avg.temperature)) {
@@ -309,7 +399,10 @@
           <td>${readings.length - i}</td>
           <td>${formatTime(r.timestamp)}</td>
           <td style="font-weight:bold; color:#e76f51">${r.temperature.toFixed(1)}</td>
+          <td style="font-weight:bold; color:#f77f00">${r.temperature2.toFixed(1)}</td>
           <td style="font-weight:bold; color:#2a9d8f">${r.humidity.toFixed(1)}</td>
+          <td style="font-weight:bold; color:#fcbf49">${r.light_intensity.toFixed(1)}</td>
+          <td style="font-weight:bold; color:#06a77d">${r.fan_speed.toFixed(1)}</td>
         `;
         tableBodyEl.appendChild(tr);
       });
@@ -344,6 +437,66 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    }
+
+    async function fetchThresholds() {
+      try {
+        const res = await fetch('/api/thresholds');
+        if (!res.ok) throw new Error('Failed to fetch thresholds');
+        return await res.json();
+      } catch (err) {
+        console.error('Error fetching thresholds:', err);
+        return null;
+      }
+    }
+
+    function openSettings() {
+      const modal = document.getElementById('settingsModal');
+      modal.style.display = 'block';
+      fetchThresholds().then(data => {
+        if (data) {
+          document.getElementById('tempTh1').value = data.temp_threshold_1;
+          document.getElementById('tempTh2').value = data.temp_threshold_2;
+          document.getElementById('humTh').value = data.humidity_threshold;
+          document.getElementById('lightTh').value = data.light_threshold;
+        }
+      });
+    }
+
+    function closeSettings() {
+      const modal = document.getElementById('settingsModal');
+      modal.style.display = 'none';
+    }
+
+    async function saveThresholds() {
+      const payload = {
+        temp_threshold_1: parseFloat(document.getElementById('tempTh1').value),
+        temp_threshold_2: parseFloat(document.getElementById('tempTh2').value),
+        humidity_threshold: parseFloat(document.getElementById('humTh').value),
+        light_threshold: parseFloat(document.getElementById('lightTh').value)
+      };
+
+      try {
+        const res = await fetch('/api/thresholds/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Failed to update thresholds');
+        alert('Thresholds updated! ESP32 will fetch them within 30 seconds.');
+        closeSettings();
+      } catch (err) {
+        alert('Error saving thresholds: ' + err.message);
+        console.error(err);
+      }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('settingsModal');
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
     }
 
     fetchSummary();

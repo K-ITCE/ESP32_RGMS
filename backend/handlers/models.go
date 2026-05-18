@@ -1,10 +1,20 @@
 package handlers
 
-// One sensor reading (temp + humidity only)
+// Sensor readings
 type Reading struct {
-	Timestamp   int64   `json:"timestamp"`   // Unix time (seconds)
-	Temperature float64 `json:"temperature"` // e.g. 24.7
-	Humidity    float64 `json:"humidity"`    // e.g. 46.3
+    Timestamp       int64   `json:"timestamp"`			// Unix time (sec)
+    Temperature     float64 `json:"temperature"`		// DHT11 (°C)
+    Temperature2    float64 `json:"temperature2"`		// DS18B20 (°C)
+    Humidity        float64 `json:"humidity"`			// DHT11 (0-100%)
+    LightIntensity  float64 `json:"light_intensity"`	// 0-100%
+    FanSpeed        float64 `json:"fan_speed"`			// 0-100%
+}
+
+type ControlThresholds struct {
+    TempThreshold1    float64 `json:"temp_threshold_1"`
+    TempThreshold2    float64 `json:"temp_threshold_2"`
+    HumidityThreshold float64 `json:"humidity_threshold"`
+    LightThreshold    float64 `json:"light_threshold"`
 }
 
 type AverageReading struct {
