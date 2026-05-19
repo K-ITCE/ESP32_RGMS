@@ -614,13 +614,13 @@ void setup() {
     
     // Create tasks with optimized priorities
     // Priority 2 - WiFi management (important for connectivity)
-    xTaskCreatePinnedToCore(wifiTask, "WiFiTask", 4096, NULL, 2, NULL, 1);
+    xTaskCreatePinnedToCore(wifiTask, "WiFiTask", 4096, NULL, 3, NULL, 1);
     
     // Priority 2 - Sensor reading (important for data quality)
     xTaskCreatePinnedToCore(sensorTask, "SensorTask", 4096, NULL, 2, NULL, 1);
     
-    // Priority 3 - Control (real-time PWM control)
-    xTaskCreatePinnedToCore(controlTask, "ControlTask", 4096, NULL, 3, NULL, 1);
+    // Priority 3 - Control (PWM offloaded to LEDC)
+    xTaskCreatePinnedToCore(controlTask, "ControlTask", 4096, NULL, 1, NULL, 0);
     
     // Priority 1 - HTTP (can tolerate delays, doesn't block others)
     xTaskCreatePinnedToCore(httpTask, "HTTPTask", 8192, NULL, 1, NULL, 1);

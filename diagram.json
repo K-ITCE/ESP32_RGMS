@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "author": "Khalid",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 57.6, "left": 436.84, "attrs": {} },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 277.2,
+      "left": 601.8,
+      "rotate": 90,
+      "attrs": { "color": "limegreen" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led2",
+      "top": 296.4,
+      "left": 601.8,
+      "rotate": 90,
+      "attrs": { "color": "white" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 321.05,
+      "left": 536.2,
+      "rotate": 180,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": 301.85,
+      "left": 536.2,
+      "rotate": 180,
+      "attrs": { "value": "220" }
+    },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -105.3, "left": 465, "attrs": {} },
+    {
+      "type": "wokwi-ds18b20",
+      "id": "temp1",
+      "top": 247.73,
+      "left": 338.32,
+      "rotate": 180,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-photoresistor-sensor",
+      "id": "ldr1",
+      "top": -67.5,
+      "left": 301.7,
+      "rotate": 90,
+      "attrs": {}
+    },
+    { "type": "wokwi-vcc", "id": "vcc1", "top": -28.04, "left": 720, "attrs": {} },
+    { "type": "wokwi-gnd", "id": "gnd1", "top": -27.4, "left": 671.8, "rotate": 180, "attrs": {} },
+    {
+      "type": "chip-dc-motor-controller",
+      "id": "chip1",
+      "top": 241.02,
+      "left": 657.6,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text1",
+      "top": 172.8,
+      "left": 720,
+      "rotate": 270,
+      "attrs": { "text": "Motor+" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text2",
+      "top": 172.8,
+      "left": 672,
+      "rotate": 270,
+      "attrs": { "text": "Motor-" }
+    },
+    { "type": "wokwi-junction", "id": "j1", "top": 148.8, "left": 705.6, "attrs": {} },
+    { "type": "wokwi-junction", "id": "j2", "top": 148.8, "left": 753.6, "attrs": {} },
+    {
+      "type": "wokwi-text",
+      "id": "text6",
+      "top": 115.2,
+      "left": 681.6,
+      "attrs": { "text": "—▶∫—" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": 157.55,
+      "left": 576,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r4",
+      "top": 157.55,
+      "left": 240,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r5",
+      "top": 215.15,
+      "left": 240,
+      "attrs": { "value": "4700" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "esp:GND.2", "gnd1:GND", "black", [ "v0", "h144" ] ],
+    [ "gnd1:GND", "j1:J", "black", [ "v0" ] ],
+    [ "vcc1:VCC", "j2:J", "red", [ "v0" ] ],
+    [ "esp:18", "r3:1", "gold", [ "h0" ] ],
+    [ "r3:2", "chip1:G", "gold", [ "v0", "h8.4", "v86.4" ] ],
+    [ "chip1:D", "j2:J", "red", [ "h-19.2", "v19.2", "h153.6", "v-105.6" ] ],
+    [ "chip1:S", "j1:J", "black", [ "v0", "h11.41", "v-28.8", "h-105.6", "v-57.6" ] ],
+    [ "r1:2", "esp:0", "white", [ "v0", "h-18", "v-38.4", "h67.2", "v-96" ] ],
+    [ "esp:33", "r2:2", "limegreen", [ "h-9.45", "v0", "h-19.2", "v134.4" ] ],
+    [ "r1:1", "led2:A", "white", [ "v0" ] ],
+    [ "r2:1", "led1:A", "limegreen", [ "v0" ] ],
+    [ "led2:C", "j1:J", "black", [ "h-9.6", "v-105.2", "h67.2", "v-57.6" ] ],
+    [ "led1:C", "j1:J", "black", [ "h0", "v-95.6", "h48", "v-48" ] ],
+    [ "esp:4", "dht1:SDA", "green", [ "h19.2", "v-163.2", "h-67.2" ] ],
+    [ "dht1:GND", "gnd1:GND", "black", [ "v19.2", "h153.6", "v-19.2" ] ],
+    [ "esp:5V", "dht1:VCC", "red", [ "h-19.05", "v-230.4", "h57.6" ] ],
+    [ "ldr1:VCC", "esp:3V3", "red", [ "v0" ] ],
+    [ "temp1:VCC", "esp:3V3", "red", [ "v-48", "v-76.8" ] ],
+    [ "ldr1:GND", "esp:GND.1", "black", [ "v0" ] ],
+    [ "temp1:GND", "esp:GND.1", "black", [ "v0" ] ],
+    [ "esp:32", "temp1:DQ", "orange", [ "h0" ] ],
+    [ "esp:13", "ldr1:AO", "violet", [ "h0" ] ]
+  ],
+  "dependencies": {}
+}

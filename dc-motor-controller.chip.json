@@ -1,0 +1,10 @@
+{
+  "name": "IRLZ44N",
+  "author": "Khalid",
+  "pins": [
+    "G",
+    "D",
+    "S"
+  ],
+  "controls": []
+}
