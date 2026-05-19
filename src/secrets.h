@@ -1,7 +1,7 @@
 // WiFi credentials and server address
 
-#define SSID "TCL-5FE0-2.4GHz"
-#define PASSWORD "H4iu369dNpn6"
+#define SSID "[Network SSID]"
+#define PASSWORD "[Network Password]"
 
 #define SERVER_URL "[Public Server Address]/api/readings"
 // Render example:
