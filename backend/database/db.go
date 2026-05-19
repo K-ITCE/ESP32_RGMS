@@ -37,6 +37,14 @@ func Migrate(db *sql.DB) error {
 		status TEXT NOT NULL DEFAULT 'pending',
 		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 	);
+	CREATE TABLE IF NOT EXISTS thresholds (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		temp_threshold_1 REAL NOT NULL DEFAULT 25.0,
+		temp_threshold_2 REAL NOT NULL DEFAULT 28.0,
+		humidity_threshold REAL NOT NULL DEFAULT 70.0,
+		light_threshold REAL NOT NULL DEFAULT 50.0,
+		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	);
 	`
 
 	_, err := db.Exec(query)
@@ -80,4 +88,21 @@ func SeedAdmin(db *sql.DB) error {
 	}
 
 	return nil
+}
+
+func SeedThresholds(db *sql.DB) error {
+    var exists int
+    err := db.QueryRow("SELECT COUNT(*) FROM thresholds").Scan(&exists)
+    if err != nil {
+        return err
+    }
+    
+    if exists == 0 {
+        _, err := db.Exec(`
+            INSERT INTO thresholds (temp_threshold_1, temp_threshold_2, humidity_threshold, light_threshold)
+            VALUES (25.0, 28.0, 70.0, 50.0)
+        `)
+        return err
+    }
+    return nil
 }

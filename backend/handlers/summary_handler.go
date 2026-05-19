@@ -45,18 +45,18 @@ func (a *App) SummaryHandler(w http.ResponseWriter, r *http.Request) {
 		resp.Latest = &latest
 
 		sumTemp := 0.0
-		sumHum := 0.0
+        sumHum := 0.0
 
-		for i := 0; i < len(a.LastReadings); i++ {
-			sumTemp += a.LastReadings[i].Temperature
-			sumHum += a.LastReadings[i].Humidity
-		}
+        for i := 0; i < len(a.LastReadings); i++ {
+            sumTemp += a.LastReadings[i].Temperature
+            sumHum += a.LastReadings[i].Humidity
+        }
 
-		n := float64(len(a.LastReadings))
-		resp.Average = AverageReading{
-			Temperature: sumTemp / n,
-			Humidity:    sumHum / n,
-		}
+        n := float64(len(a.LastReadings))
+        resp.Average = AverageReading{
+            Temperature: sumTemp / n,
+            Humidity:    sumHum / n,
+        }
 	}
 
 	count := len(a.LastReadings)
