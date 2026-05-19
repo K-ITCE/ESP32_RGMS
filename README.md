@@ -53,11 +53,19 @@ Five concurrent tasks run on the dual-core ESP32, with priority-based scheduling
 
 | Task | Priority | Core | Stack | Frequency | Purpose |
 |------|----------|------|-------|-----------|---------|
-| wifiTask | 2 | 1 | 4096 | Continuous | WiFi connection monitoring |
+| wifiTask | 3 | 1 | 4096 | Continuous | WiFi connection monitoring (foundational) |
 | sensorTask | 2 | 1 | 4096 | 5s cycle | Sensor data acquisition |
-| controlTask | 3 | 1 | 4096 | Event-driven | PWM calculation & threshold fetching |
-| httpTask | 1 | 1 | 8192 | Event-driven | Backend data transmission |
+| httpTask | 1 | 1 | 8192 | Event-driven | Backend data transmission (blocking I/O) |
+| controlTask | 1 | 0 | 4096 | Event-driven | PWM calculation & threshold fetching (hardware LEDC independent) |
 | ledTask | 0 | 0 | 2048 | Event-driven | Visual status feedback |
+
+### Task Priority Rationale
+
+- **Core 1 (Real-time I/O):** WiFi (3), Sensors (2), HTTP (1) handle the demanding networking and data acquisition workloads
+- **Core 0 (Lightweight Control):** ControlTask (1), LEDTask (0) perform simple message handling and PWM updates
+- **WiFiTask priority boosted to 3:** WiFi connectivity is foundational; all other tasks depend on it
+- **ControlTask deprioritized to 1:** Hardware LEDC PWM controller runs independently of CPU; task only needs to update registers when thresholds cross (infrequent in stable greenhouse environments)
+- **ControlTask moved to Core 0:** Reduces contention on Core 1 for networking operations
 
 ### Data Flow
 
