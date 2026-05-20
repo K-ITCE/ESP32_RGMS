@@ -66,7 +66,7 @@
       "type": "wokwi-text",
       "id": "text1",
       "top": 172.8,
-      "left": 720,
+      "left": 729.6,
       "rotate": 270,
       "attrs": { "text": "Motor+" }
     },
@@ -74,7 +74,7 @@
       "type": "wokwi-text",
       "id": "text2",
       "top": 172.8,
-      "left": 672,
+      "left": 681.6,
       "rotate": 270,
       "attrs": { "text": "Motor-" }
     },
@@ -97,15 +97,16 @@
     {
       "type": "wokwi-resistor",
       "id": "r4",
-      "top": 157.55,
-      "left": 240,
+      "top": 42.35,
+      "left": 297.6,
       "attrs": { "value": "1000" }
     },
     {
       "type": "wokwi-resistor",
       "id": "r5",
-      "top": 215.15,
-      "left": 240,
+      "top": 187.2,
+      "left": 297.05,
+      "rotate": 90,
       "attrs": { "value": "4700" }
     }
   ],
@@ -128,12 +129,16 @@
     [ "esp:4", "dht1:SDA", "green", [ "h19.2", "v-163.2", "h-67.2" ] ],
     [ "dht1:GND", "gnd1:GND", "black", [ "v19.2", "h153.6", "v-19.2" ] ],
     [ "esp:5V", "dht1:VCC", "red", [ "h-19.05", "v-230.4", "h57.6" ] ],
-    [ "ldr1:VCC", "esp:3V3", "red", [ "v0" ] ],
-    [ "temp1:VCC", "esp:3V3", "red", [ "v-48", "v-76.8" ] ],
+    [ "ldr1:VCC", "esp:3V3", "violet", [ "v0" ] ],
+    [ "temp1:VCC", "esp:3V3", "violet", [ "v-48", "v-76.8" ] ],
     [ "ldr1:GND", "esp:GND.1", "black", [ "v0" ] ],
     [ "temp1:GND", "esp:GND.1", "black", [ "v0" ] ],
     [ "esp:32", "temp1:DQ", "orange", [ "h0" ] ],
-    [ "esp:13", "ldr1:AO", "violet", [ "h0" ] ]
+    [ "esp:13", "ldr1:AO", "cyan", [ "h0" ] ],
+    [ "r5:1", "temp1:DQ", "orange", [ "h0", "v-28.8", "h28.8" ] ],
+    [ "r5:2", "temp1:VCC", "violet", [ "h0", "v18" ] ],
+    [ "ldr1:AO", "r4:2", "cyan", [ "v0" ] ],
+    [ "r4:1", "ldr1:GND", "black", [ "v0", "h-9.6", "v19.2", "h105.6" ] ]
   ],
   "dependencies": {}
 }
